@@ -171,7 +171,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
         <a href="/jobs" className="text-blue-600 hover:underline text-sm mb-6 inline-block">← Back to Jobs</a>
 
-        {/* JOB HEADER */}
         <div className="bg-white border border-gray-200 rounded-xl p-8 mb-6">
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -195,7 +194,6 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           </div>
         </div>
 
-        {/* JOB DETAILS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           <div className="md:col-span-2 flex flex-col gap-6">

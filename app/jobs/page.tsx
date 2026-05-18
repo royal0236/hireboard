@@ -1,32 +1,64 @@
-import Navbar from "../components/Navbar"
-import JobCard from "../components/JobCard"
+"use client";
 
-const jobs = [
-  { id: 1, title: "Senior Frontend Developer", company: "Google", location: "Remote", salary: "$120k – $160k/yr", type: "Full-time", tags: ["React", "TypeScript", "Next.js"] },
-  { id: 2, title: "Backend Engineer", company: "Stripe", location: "New York", salary: "$140k – $180k/yr", type: "Contract", tags: ["Node.js", "PostgreSQL"] },
-  { id: 3, title: "UI/UX Designer", company: "Figma", location: "Remote", salary: "$80k – $110k/yr", type: "Part-time", tags: ["Figma", "Design Systems"] },
-  { id: 4, title: "Data Scientist", company: "Netflix", location: "Remote", salary: "$130k – $170k/yr", type: "Full-time", tags: ["Python", "Machine Learning", "SQL"] },
-  { id: 5, title: "DevOps Engineer", company: "Amazon", location: "Seattle", salary: "$150k – $190k/yr", type: "Full-time", tags: ["AWS", "Docker", "Kubernetes"] },
-  { id: 6, title: "Mobile Developer", company: "Spotify", location: "Remote", salary: "$110k – $140k/yr", type: "Contract", tags: ["React Native", "iOS", "Android"] },
-]
+import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
+import JobCard from "../components/JobCard";
+import { supabase } from "../supabaseClient";
 
-const jobTypes = ["All", "Full-time", "Contract", "Part-time"]
+const jobTypes = ["All", "Full-time", "Contract", "Part-time"];
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  async function fetchJobs() {
+    try {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .order("id", { ascending: true });
+
+      console.log("data:", data);
+      console.log("error:", error);
+
+      if (error) throw error;
+
+      setJobs(data || []);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-gray-900 mb-4">
+            Loading jobs...
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
-
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-12">
-
-        {/* PAGE HEADER */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Browse Jobs</h1>
-          <p className="text-gray-500">{jobs.length} jobs available right now</p>
+          <p className="text-gray-500">
+            {jobs.length} jobs available right now
+          </p>
         </div>
 
-        {/* SEARCH + FILTER BAR */}
         <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row gap-3 mb-8">
           <input
             type="text"
@@ -44,7 +76,6 @@ export default function JobsPage() {
           </button>
         </div>
 
-        {/* JOB TYPE FILTERS */}
         <div className="flex gap-2 mb-6 flex-wrap">
           {jobTypes.map((type) => (
             <button
@@ -56,14 +87,21 @@ export default function JobsPage() {
           ))}
         </div>
 
-        {/* JOB LIST */}
         <div className="flex flex-col gap-4">
           {jobs.map((job) => (
-            <JobCard key={job.id} {...job} />
+            <JobCard
+              key={job.id}
+              id={job.id}
+              title={job.title}
+              company={job.company}
+              location={job.location}
+              salary={job.salary}
+              type={job.type}
+              tags={job.tags}
+            />
           ))}
         </div>
-
       </div>
     </main>
-  )
+  );
 }
