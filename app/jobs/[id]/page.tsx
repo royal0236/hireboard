@@ -1,20 +1,45 @@
+'use client'
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Navbar from "../../components/Navbar";
+import ApplyModal from "../../components/ApplyModal";
 import { supabase } from "../../supabaseClient";
 
-export default async function JobDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function JobDetailPage() {
+  const params = useParams();
+  const [job, setJob] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
-  const { data: job, error } = await supabase
-    .from("jobs")
-    .select("*")
-    .eq("id", id)
-    .single();
+  useEffect(() => {
+    fetchJob();
+  }, []);
 
-  if (error || !job) {
+  async function fetchJob() {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("id", params.id)
+      .single();
+
+    if (error || !data) {
+      setJob(null);
+    } else {
+      setJob(data);
+    }
+    setLoading(false);
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-4xl font-bold text-gray-900">Loading...</div>
+      </main>
+    );
+  }
+
+  if (!job) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -38,6 +63,15 @@ export default async function JobDetailPage({
   return (
     <main className="min-h-screen bg-gray-50">
       <Navbar />
+
+      {showModal && (
+        <ApplyModal
+          jobId={job.id}
+          jobTitle={job.title}
+          company={job.company}
+          onClose={() => setShowModal(false)}
+        />
+      )}
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         <a
@@ -79,7 +113,10 @@ export default async function JobDetailPage({
             <p className="text-gray-400 text-sm">
               Posted {new Date(job.posted_at).toLocaleDateString()}
             </p>
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-medium text-lg">
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-medium text-lg"
+            >
               Apply Now
             </button>
           </div>
@@ -160,7 +197,10 @@ export default async function JobDetailPage({
               </div>
             </div>
 
-            <button className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-medium">
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-medium"
+            >
               Apply Now
             </button>
             <button className="w-full border border-gray-300 text-gray-600 py-3 rounded-xl hover:border-blue-500 hover:text-blue-600 font-medium">
