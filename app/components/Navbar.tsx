@@ -30,22 +30,13 @@ export default function Navbar() {
           Browse Jobs
         </a>
 
-        {user ? (
-          <>
-            <span className="text-gray-500 text-sm">{user.email}</span>
-            <a
-              href="/post-job"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium"
-            >
-              Post a Job
-            </a>
-            <button
-              onClick={handleLogout}
-              className="text-gray-500 hover:text-red-500 font-medium text-sm"
-            >
-              Logout
-            </button>
-          </>
+       {user ? (
+  <>
+    <span className="text-gray-500 text-sm">{user.email}</span>
+    <a href="/my-applications" className="text-gray-600 hover:text-blue-600 font-medium">My Applications</a>
+    <a href="/post-job" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">Post a Job</a>
+    <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 font-medium text-sm">Logout</button>
+  </>
         ) : (
           <>
             <a
